@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "backend": {
+    "api": {
+      "mytasksdemo": {
+        "provider": "awscloudformation",
+        "service": "AppSync",
+        "output": {
+          "authConfig": {
+            "defaultAuthentication": {
+              "authenticationType": "AMAZON_COGNITO_USER_POOLS",
+              "userPoolConfig": {
+                "userPoolId": "us-east-1_ABC123"
+              }
+            },
+            "additionalAuthenticationProviders": []
+          }
+        }
+      }
+    }
+  }
+}

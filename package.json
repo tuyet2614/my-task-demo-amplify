@@ -1,0 +1,31 @@
+{
+  "name": "my-tasks-demo",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@aws-amplify/adapter-nextjs": "^1.0.13",
+    "@aws-amplify/core": "^6.9.1",
+    "aws-amplify": "^6.12.1",
+    "next": "14.2.6",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@aws-amplify/cli": "^12.10.1",
+    "@types/node": "^20.11.0",
+    "@types/react": "^18.2.47",
+    "@types/react-dom": "^18.2.18",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^8.56.0",
+    "eslint-config-next": "14.2.6",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.3.3"
+  }
+}

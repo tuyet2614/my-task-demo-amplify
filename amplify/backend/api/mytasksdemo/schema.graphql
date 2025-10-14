@@ -1,0 +1,28 @@
+# GraphQL Schema for My Tasks Demo
+
+type User @model @auth(rules: [{ allow: owner }]) {
+  id: ID!
+  email: String!
+  name: String!
+  avatar: String
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type Task @model @auth(rules: [{ allow: owner }]) {
+  id: ID!
+  title: String!
+  description: String
+  status: TaskStatus!
+  attachment: String
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+enum TaskStatus {
+  TODO
+  DONE
+}
+
+# Custom queries and mutations can be added here
+# For now, we'll use the auto-generated CRUD operations

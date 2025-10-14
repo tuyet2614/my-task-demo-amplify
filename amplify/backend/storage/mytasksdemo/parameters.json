@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "backend": {
+    "storage": {
+      "mytasksdemo": {
+        "provider": "awscloudformation",
+        "service": "S3",
+        "output": {
+          "BucketName": "mytasksdemo-storage",
+          "Region": "us-east-1"
+        }
+      }
+    }
+  }
+}

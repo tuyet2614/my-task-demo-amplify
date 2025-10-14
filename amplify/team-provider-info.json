@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "backend": {
+    "api": {
+      "mytasksdemo": {
+        "provider": "awscloudformation",
+        "service": "AppSync",
+        "output": {
+          "GraphQLAPIEndpointOutput": "https://abc123.appsync-api.us-east-1.amazonaws.com/graphql",
+          "GraphQLAPIIdOutput": "abc123",
+          "GraphQLAPIKeyOutput": "da2-abc123"
+        }
+      }
+    },
+    "auth": {
+      "mytasksdemo": {
+        "provider": "awscloudformation",
+        "service": "Cognito",
+        "output": {
+          "UserPoolId": "us-east-1_ABC123",
+          "UserPoolArn": "arn:aws:cognito-idp:us-east-1:123456789012:userpool/us-east-1_ABC123",
+          "UserPoolName": "mytasksdemo",
+          "AppClientID": "client123",
+          "AppClientIDWeb": "client123",
+          "HostedUIDomain": "mytasksdemo.auth.us-east-1.amazoncognito.com"
+        }
+      }
+    },
+    "storage": {
+      "mytasksdemo": {
+        "provider": "awscloudformation",
+        "service": "S3",
+        "output": {
+          "BucketName": "mytasksdemo-storage",
+          "Region": "us-east-1"
+        }
+      }
+    }
+  }
+}

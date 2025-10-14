@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "backend": {
+    "auth": {
+      "mytasksdemo": {
+        "provider": "awscloudformation",
+        "service": "Cognito",
+        "output": {
+          "UserPoolId": "us-east-1_ABC123",
+          "UserPoolArn": "arn:aws:cognito-idp:us-east-1:123456789012:userpool/us-east-1_ABC123",
+          "UserPoolName": "mytasksdemo",
+          "AppClientID": "client123",
+          "AppClientIDWeb": "client123",
+          "HostedUIDomain": "mytasksdemo.auth.us-east-1.amazoncognito.com",
+          "OAuthMetadata": "{\"AllowedOAuthFlows\":[\"code\"],\"AllowedOAuthScopes\":[\"phone\",\"email\",\"openid\",\"profile\",\"aws.cognito.signin.user.admin\"],\"AllowedOAuthCallbacks\":[\"http://localhost:3000/\"],\"AllowedOAuthRedirectUris\":[\"http://localhost:3000/\"]}"
+        }
+      }
+    }
+  }
+}
