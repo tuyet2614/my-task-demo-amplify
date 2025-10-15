@@ -1,5 +1,6 @@
 "use client";
 
+import "@/lib/amplify";
 import { useState } from "react";
 import { authService } from "@/lib/auth";
 
