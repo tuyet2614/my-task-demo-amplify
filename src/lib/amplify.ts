@@ -1,4 +1,4 @@
-import { Amplify } from 'aws-amplify'
+import { Amplify } from "aws-amplify";
 
 const amplifyConfig = {
   Auth: {
@@ -10,7 +10,6 @@ const amplifyConfig = {
         username: false,
         phone: false,
       },
-      signUpVerificationMethod: 'code',
       userAttributes: {
         email: {
           required: true,
@@ -23,9 +22,10 @@ const amplifyConfig = {
   },
   API: {
     GraphQL: {
+      apiUrl: process.env.NEXT_PUBLIC_AWS_APPSYNC_GRAPHQLENDPOINT!,
       endpoint: process.env.NEXT_PUBLIC_AWS_APPSYNC_GRAPHQLENDPOINT!,
       region: process.env.NEXT_PUBLIC_AWS_REGION!,
-      defaultAuthMode: 'userPool',
+      defaultAuthMode: "API_KEY" as any,
     },
   },
   Storage: {
@@ -34,8 +34,8 @@ const amplifyConfig = {
       region: process.env.NEXT_PUBLIC_AWS_REGION!,
     },
   },
-}
+};
 
-Amplify.configure(amplifyConfig)
+Amplify.configure(amplifyConfig);
 
-export default amplifyConfig
+export default amplifyConfig;

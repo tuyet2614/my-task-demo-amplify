@@ -1,4 +1,4 @@
-import { uploadData, downloadData, remove, getUrl } from 'aws-amplify/storage'
+import { uploadData, downloadData, remove, getUrl } from "aws-amplify/storage";
 
 export const storageService = {
   async uploadFile(file: File, key: string): Promise<string> {
@@ -7,13 +7,13 @@ export const storageService = {
         key,
         data: file,
         options: {
-          accessLevel: 'private',
+          accessLevel: "private",
         },
-      }).result
-      return result.key
+      }).result;
+      return result.key;
     } catch (error) {
-      console.error('Upload file error:', error)
-      throw error
+      console.error("Upload file error:", error);
+      throw error;
     }
   },
 
@@ -22,13 +22,17 @@ export const storageService = {
       const result = await downloadData({
         key,
         options: {
-          accessLevel: 'private',
+          accessLevel: "private",
         },
-      }).result
-      return result.body as Blob
+      }).result;
+      const body = result.body as unknown;
+      if (body instanceof Blob) {
+        return body;
+      }
+      throw new Error("Downloaded data body is not a Blob");
     } catch (error) {
-      console.error('Download file error:', error)
-      throw error
+      console.error("Download file error:", error);
+      throw error;
     }
   },
 
@@ -37,12 +41,12 @@ export const storageService = {
       await remove({
         key,
         options: {
-          accessLevel: 'private',
+          accessLevel: "private",
         },
-      })
+      });
     } catch (error) {
-      console.error('Delete file error:', error)
-      throw error
+      console.error("Delete file error:", error);
+      throw error;
     }
   },
 
@@ -51,13 +55,13 @@ export const storageService = {
       const result = await getUrl({
         key,
         options: {
-          accessLevel: 'private',
+          accessLevel: "private",
         },
-      })
-      return result.url.toString()
+      });
+      return result.url.toString();
     } catch (error) {
-      console.error('Get file URL error:', error)
-      throw error
+      console.error("Get file URL error:", error);
+      throw error;
     }
   },
-}
+};

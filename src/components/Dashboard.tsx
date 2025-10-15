@@ -1,51 +1,50 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { authService } from '@/lib/auth'
-import { storageService } from '@/lib/storage'
-import TaskList from './TaskList'
-import TaskForm from './TaskForm'
+import { useState, useEffect } from "react";
+import { authService } from "@/lib/auth";
+import TaskForm from "./tasks/TaskForm";
+import TaskList from "./tasks/TaskList";
 
 export default function Dashboard() {
-  const [user, setUser] = useState<any>(null)
-  const [showTaskForm, setShowTaskForm] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
+  const [user, setUser] = useState<any>(null);
+  const [showTaskForm, setShowTaskForm] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    loadUser()
-  }, [])
+    loadUser();
+  }, []);
 
   const loadUser = async () => {
     try {
-      const currentUser = await authService.getCurrentUser()
-      setUser(currentUser)
+      const currentUser = await authService.getCurrentUser();
+      setUser(currentUser);
     } catch (error) {
-      console.error('Failed to load user:', error)
+      console.error("Failed to load user:", error);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleSignOut = async () => {
     try {
-      await authService.signOut()
-      window.location.href = '/login'
+      await authService.signOut();
+      window.location.href = "/login";
     } catch (error) {
-      console.error('Sign out failed:', error)
+      console.error("Sign out failed:", error);
     }
-  }
+  };
 
   const handleTaskCreated = () => {
-    setShowTaskForm(false)
+    setShowTaskForm(false);
     // TaskList will automatically reload
-  }
+  };
 
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-lg">Loading...</div>
       </div>
-    )
+    );
   }
 
   if (!user) {
@@ -53,15 +52,12 @@ export default function Dashboard() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-xl font-semibold mb-4">Please sign in</h2>
-          <a
-            href="/login"
-            className="text-indigo-600 hover:text-indigo-500"
-          >
+          <a href="/login" className="text-indigo-600 hover:text-indigo-500">
             Go to login page
           </a>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -72,7 +68,7 @@ export default function Dashboard() {
           <div className="flex justify-between items-center py-6">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">My Tasks</h1>
-              <p className="text-gray-600">Welcome back, {user.signInDetails?.loginId || 'User'}!</p>
+              <p className="text-gray-600">Welcome back, {user.signInDetails?.loginId || "User"}!</p>
             </div>
             <div className="flex items-center space-x-4">
               <button
@@ -81,10 +77,7 @@ export default function Dashboard() {
               >
                 + New Task
               </button>
-              <button
-                onClick={handleSignOut}
-                className="text-gray-600 hover:text-gray-900"
-              >
+              <button onClick={handleSignOut} className="text-gray-600 hover:text-gray-900">
                 Sign Out
               </button>
             </div>
@@ -96,10 +89,7 @@ export default function Dashboard() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {showTaskForm ? (
           <div className="max-w-2xl mx-auto">
-            <TaskForm
-              onTaskCreated={handleTaskCreated}
-              onCancel={() => setShowTaskForm(false)}
-            />
+            <TaskForm onTaskCreated={handleTaskCreated} onCancel={() => setShowTaskForm(false)} />
           </div>
         ) : (
           <div className="max-w-4xl mx-auto">
@@ -111,9 +101,7 @@ export default function Dashboard() {
       {/* Demo Info */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-blue-900 mb-2">
-            🚀 AWS Amplify Demo Features
-          </h3>
+          <h3 className="text-lg font-semibold text-blue-900 mb-2">🚀 AWS Amplify Demo Features</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-blue-800">
             <div>
               <strong>✅ Authentication:</strong> Cognito User Pool
@@ -128,5 +116,5 @@ export default function Dashboard() {
         </div>
       </div>
     </div>
-  )
+  );
 }
