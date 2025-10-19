@@ -25,7 +25,8 @@ const amplifyConfig = {
       apiUrl: process.env.NEXT_PUBLIC_AWS_APPSYNC_GRAPHQLENDPOINT!,
       endpoint: process.env.NEXT_PUBLIC_AWS_APPSYNC_GRAPHQLENDPOINT!,
       region: process.env.NEXT_PUBLIC_AWS_REGION!,
-      defaultAuthMode: "userPool" as any,
+      defaultAuthMode: "apiKey" as any,
+      apiKey: process.env.NEXT_PUBLIC_AWS_API_KEY!,
     },
   },
   Storage: {

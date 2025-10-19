@@ -1,43 +1,47 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { taskService } from '@/lib/api'
-import { CreateTaskInput } from '@/types'
+import { useState } from "react";
+import { taskService } from "@/lib/api";
+import { CreateTaskInput, TaskStatus } from "@/types";
 
 interface TaskFormProps {
-  onTaskCreated: () => void
-  onCancel: () => void
+  onTaskCreated: () => void;
+  onCancel: () => void;
 }
 
 export default function TaskForm({ onTaskCreated, onCancel }: TaskFormProps) {
-  const [title, setTitle] = useState('')
-  const [description, setDescription] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState('')
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
-    setError('')
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
 
     try {
       const input: CreateTaskInput = {
         title: title.trim(),
-        description: description.trim() || undefined,
-      }
-      await taskService.createTask(input)
-      onTaskCreated()
+        description: description.trim(),
+        status: TaskStatus.OPEN,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      console.log("🚀 ~ handleSubmit ~ input:", input);
+      await taskService.createTask(input);
+      onTaskCreated();
     } catch (err: any) {
-      setError(err.message || 'Failed to create task')
+      setError(err.message || "Failed to create task");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
       <h2 className="text-xl font-semibold mb-4">Create New Task</h2>
-      
+
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label htmlFor="title" className="block text-sm font-medium text-gray-700">
@@ -68,9 +72,7 @@ export default function TaskForm({ onTaskCreated, onCancel }: TaskFormProps) {
           />
         </div>
 
-        {error && (
-          <div className="text-red-600 text-sm">{error}</div>
-        )}
+        {error && <div className="text-red-600 text-sm">{error}</div>}
 
         <div className="flex justify-end space-x-3">
           <button
@@ -85,10 +87,10 @@ export default function TaskForm({ onTaskCreated, onCancel }: TaskFormProps) {
             disabled={isLoading || !title.trim()}
             className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
           >
-            {isLoading ? 'Creating...' : 'Create Task'}
+            {isLoading ? "Creating..." : "Create Task"}
           </button>
         </div>
       </form>
     </div>
-  )
+  );
 }

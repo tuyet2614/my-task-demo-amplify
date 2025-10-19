@@ -3,7 +3,9 @@
 import "@/lib/amplify";
 import { useState } from "react";
 import { authService } from "@/lib/auth";
-
+import { customToast } from "@/components/toast/customToast";
+import OtpInput from "react-otp-input";
+import { useRouter } from "next/navigation";
 export default function SignUpForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -11,7 +13,8 @@ export default function SignUpForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
-
+  const [otp, setOtp] = useState("");
+  const router = useRouter();
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -19,8 +22,10 @@ export default function SignUpForm() {
 
     try {
       const result = await authService.signUp({ email, password, name });
-      if (result.isSignUpComplete) {
+      console.log("🚀 ~ handleSubmit ~ result:", result);
+      if (result.nextStep.signUpStep === "CONFIRM_SIGN_UP") {
         setSuccess(true);
+        customToast.success("We've sent you a verification code");
       }
     } catch (err: any) {
       setError(err.message || "Sign up failed");
@@ -28,22 +33,32 @@ export default function SignUpForm() {
       setIsLoading(false);
     }
   };
+  console.log("🚀 ~ SignUpForm ~ success:", success);
 
+  const handleConfirmSignUp = async () => {
+    try {
+      await authService.confirmSignUp({ email, code: otp });
+      customToast.success("Account confirmed");
+      router.push("/dashboard");
+    } catch (err: any) {
+      setError(err.message || "Confirm sign up failed");
+    } finally {
+      setIsLoading(false);
+    }
+  };
   if (success) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8">
-          <div className="text-center">
-            <h2 className="mt-6 text-3xl font-extrabold text-gray-900">Check your email</h2>
-            <p className="mt-2 text-sm text-gray-600">
-              We've sent you a verification code. Please check your email and click the link to verify your account.
-            </p>
-            <div className="mt-6">
-              <a href="/login" className="font-medium text-indigo-600 hover:text-indigo-500">
-                Back to sign in
-              </a>
-            </div>
-          </div>
+          <p>Please check your email for the verification code</p>
+          <OtpInput
+            value={otp}
+            onChange={setOtp}
+            numInputs={6}
+            renderSeparator={<span>-</span>}
+            renderInput={(props) => <input {...props} />}
+          />
+          <button onClick={handleConfirmSignUp}>Confirm</button>
         </div>
       </div>
     );

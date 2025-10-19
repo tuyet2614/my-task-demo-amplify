@@ -1,14 +1,19 @@
-import { signUp, signIn, signOut, getCurrentUser } from 'aws-amplify/auth'
+import { signUp, signIn, signOut, getCurrentUser, confirmSignUp } from "aws-amplify/auth";
 
 export interface SignUpParams {
-  email: string
-  password: string
-  name: string
+  email: string;
+  password: string;
+  name: string;
 }
 
 export interface SignInParams {
-  email: string
-  password: string
+  email: string;
+  password: string;
+}
+
+export interface ConfirmSignUpParams {
+  email: string;
+  code: string;
 }
 
 export const authService = {
@@ -23,11 +28,23 @@ export const authService = {
             name,
           },
         },
-      })
-      return { isSignUpComplete, userId, nextStep }
+      });
+      return { isSignUpComplete, userId, nextStep };
     } catch (error) {
-      console.error('Sign up error:', error)
-      throw error
+      console.error("Sign up error:", error);
+      throw error;
+    }
+  },
+
+  async confirmSignUp({ email, code }: ConfirmSignUpParams) {
+    try {
+      await confirmSignUp({
+        username: email,
+        confirmationCode: code,
+      });
+    } catch (error) {
+      console.error("Confirm sign up error:", error);
+      throw error;
     }
   },
 
@@ -36,30 +53,30 @@ export const authService = {
       const { isSignedIn, nextStep } = await signIn({
         username: email,
         password,
-      })
-      return { isSignedIn, nextStep }
+      });
+      return { isSignedIn, nextStep };
     } catch (error) {
-      console.error('Sign in error:', error)
-      throw error
+      console.error("Sign in error:", error);
+      throw error;
     }
   },
 
   async signOut() {
     try {
-      await signOut()
+      await signOut();
     } catch (error) {
-      console.error('Sign out error:', error)
-      throw error
+      console.error("Sign out error:", error);
+      throw error;
     }
   },
 
   async getCurrentUser() {
     try {
-      const user = await getCurrentUser()
-      return user
+      const user = await getCurrentUser();
+      return user;
     } catch (error) {
-      console.error('Get current user error:', error)
-      return null
+      console.error("Get current user error:", error);
+      return null;
     }
   },
-}
+};
