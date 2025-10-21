@@ -5,14 +5,29 @@ import { authService } from "@/lib/auth";
 import { storageService } from "@/lib/storage";
 import FileUpload from "./FileUpload";
 
+interface UploadedFile {
+  key: string;
+  lastModified: Date | undefined;
+  size: number | undefined;
+  url?: string;
+}
+
 export default function Profile() {
   const [user, setUser] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showFileUpload, setShowFileUpload] = useState(false);
   const [avatar, setAvatar] = useState<string>("");
+  const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
+  const [isLoadingFiles, setIsLoadingFiles] = useState(false);
 
   useEffect(() => {
     loadUser();
+    loadUploadedFiles();
+    // Load saved avatar from localStorage
+    const savedAvatar = localStorage.getItem("userAvatar");
+    if (savedAvatar) {
+      setAvatar(savedAvatar);
+    }
   }, []);
 
   const loadUser = async () => {
@@ -23,6 +38,39 @@ export default function Profile() {
       console.error("Failed to load user:", error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const loadUploadedFiles = async () => {
+    setIsLoadingFiles(true);
+    try {
+      const files = await storageService.listFiles();
+      const filesWithUrls = await Promise.all(
+        files.map(async (file) => {
+          try {
+            const url = await storageService.getFileUrl(file.path);
+            return {
+              key: file.path,
+              lastModified: file.lastModified,
+              size: file.size,
+              url: url,
+            };
+          } catch (error) {
+            console.error(`Failed to get URL for file ${file.path}:`, error);
+            return {
+              key: file.path,
+              lastModified: file.lastModified,
+              size: file.size,
+              url: undefined,
+            };
+          }
+        })
+      );
+      setUploadedFiles(filesWithUrls);
+    } catch (error) {
+      console.error("Failed to load uploaded files:", error);
+    } finally {
+      setIsLoadingFiles(false);
     }
   };
 
@@ -37,8 +85,30 @@ export default function Profile() {
 
   const handleFileUploaded = (fileUrl: string) => {
     setAvatar(fileUrl);
+    localStorage.setItem("userAvatar", fileUrl);
     setShowFileUpload(false);
-    // In a real app, you would update the user's avatar in the database
+    // Reload the files list to show the new upload
+    loadUploadedFiles();
+  };
+
+  const handleSetAvatar = (fileUrl: string) => {
+    setAvatar(fileUrl);
+    localStorage.setItem("userAvatar", fileUrl);
+  };
+
+  const handleDeleteFile = async (fileKey: string) => {
+    try {
+      await storageService.deleteFile(fileKey);
+      // Remove from local state
+      setUploadedFiles((prev) => prev.filter((file) => file.key !== fileKey));
+      // If this was the current avatar, clear it
+      if (avatar && uploadedFiles.find((f) => f.key === fileKey)?.url === avatar) {
+        setAvatar("");
+        localStorage.removeItem("userAvatar");
+      }
+    } catch (error) {
+      console.error("Failed to delete file:", error);
+    }
   };
 
   if (isLoading) {
@@ -103,24 +173,89 @@ export default function Profile() {
             </div>
 
             <div className="mt-8">
-              <h4 className="text-md font-medium text-gray-900 mb-4">Avatar Upload Demo</h4>
+              <h4 className="text-md font-medium text-gray-900 mb-4">File Management</h4>
 
+              {/* Current Avatar */}
               {avatar && (
-                <div className="mb-4">
+                <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+                  <h5 className="text-sm font-medium text-gray-700 mb-2">Current Avatar</h5>
                   <img src={avatar} alt="Avatar" className="h-20 w-20 rounded-full object-cover" />
                 </div>
               )}
 
+              {/* Upload Button */}
               {showFileUpload ? (
                 <FileUpload onFileUploaded={handleFileUploaded} onCancel={() => setShowFileUpload(false)} />
               ) : (
                 <button
                   onClick={() => setShowFileUpload(true)}
-                  className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="mb-6 bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 >
-                  Upload Avatar
+                  Upload New File
                 </button>
               )}
+
+              {/* Files List */}
+              <div className="mt-6">
+                <h5 className="text-sm font-medium text-gray-700 mb-4">Uploaded Files</h5>
+
+                {isLoadingFiles ? (
+                  <div className="text-gray-500">Loading files...</div>
+                ) : uploadedFiles.length === 0 ? (
+                  <div className="text-gray-500">No files uploaded yet.</div>
+                ) : (
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    {uploadedFiles.map((file) => (
+                      <div key={file.key} className="border border-gray-200 rounded-lg p-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <h6 className="text-sm font-medium text-gray-900 truncate">{file.key.split("/").pop()}</h6>
+                          <div className="flex space-x-1">
+                            {file.url && (
+                              <button
+                                onClick={() => handleSetAvatar(file.url!)}
+                                className={`text-xs px-2 py-1 rounded ${
+                                  avatar === file.url
+                                    ? "bg-indigo-100 text-indigo-700"
+                                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                }`}
+                              >
+                                {avatar === file.url ? "Avatar" : "Set Avatar"}
+                              </button>
+                            )}
+                            <button
+                              onClick={() => handleDeleteFile(file.key)}
+                              className="text-xs px-2 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </div>
+
+                        {file.url && (
+                          <div className="mb-2">
+                            <img
+                              src={file.url}
+                              alt="Uploaded file"
+                              className="w-full h-24 object-cover rounded"
+                              onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                target.style.display = "none";
+                              }}
+                            />
+                          </div>
+                        )}
+
+                        <div className="text-xs text-gray-500">
+                          <div>Size: {file.size ? (file.size / 1024).toFixed(1) : "Unknown"} KB</div>
+                          <div>
+                            Uploaded: {file.lastModified ? new Date(file.lastModified).toLocaleDateString() : "Unknown"}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-4">

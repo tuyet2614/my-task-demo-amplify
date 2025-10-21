@@ -68,7 +68,9 @@ export default function Dashboard() {
           <div className="flex justify-between items-center py-6">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">My Tasks</h1>
-              <p className="text-gray-600">Welcome back, {user.signInDetails?.loginId || "User"}!</p>
+              <a href="/profile" className="text-gray-600">
+                Welcome back, {user.signInDetails?.loginId || "User"}!
+              </a>
             </div>
             <div className="flex items-center space-x-4">
               <button
